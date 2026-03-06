@@ -11,9 +11,12 @@ class Settings(BaseSettings):
     # -- MQTT CONFIG --
     AL_MQTT_ENDPOINT: str
     AL_MQTT_HOST: str
-    AL_MQTT_PORT: int
+    AL_MQTT_PORT: str
     AL_MQTT_SUBSCRIBE_TOPIC: str
     AL_MQTT_PATH:str
+
+    # -- CORE CONFIG --
+    CORE_URL: str
 
     class Config:
         env_file = "config/.env"
