@@ -33,5 +33,5 @@ class IngestionOrchestrationPipeline(CoreAPIClient):
         self._post("requests-builder/upsert/to-request")
 
     def return_requests_made(self):
-        response = self._get("requests-builder/response/requests-made")
+        response = self._get("requests-builder/response/requests-made/db")
         return response.json()

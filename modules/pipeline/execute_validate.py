@@ -21,7 +21,7 @@ class ExecutionAndValidationPipeline(CoreAPIClient):
         super().__init__()
 
     def execute_sap(self):
-        self._post("sap/sap-manager/session")
+        self._post("/sap-manager/session")
 
     def execute_requests_builder(self):
         self._post("requests-builder/requester")
