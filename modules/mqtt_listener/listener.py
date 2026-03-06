@@ -5,7 +5,7 @@ import paho.mqtt.client as mqtt
 
 class MQTTOrchestrator:
     def __init__(self):
-        self.host = settings.AL_MQTT_IP
+        self.host = settings.AL_MQTT_HOST
         self.port = settings.AL_MQTT_PORT
         self.ws_path = settings.AL_MQTT_PATH
 
@@ -19,8 +19,7 @@ class MQTTOrchestrator:
         self.client.on_message = self._on_message
 
     def _on_message(self, client, userdata, msg):
-        # call core pipeline
-        pass 
+        runner()
 
     def connect(self):
         self.client.connect(self.host, self.port)
@@ -28,3 +27,7 @@ class MQTTOrchestrator:
 
     def start(self):
         self.client.loop_forever()
+
+    def stop(self):
+        self.client.loop_stop()
+        self.client.disconnect()

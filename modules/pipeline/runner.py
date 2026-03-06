@@ -1,28 +1,35 @@
-# aqui, é onde vai fazer todo pipeline mais importante do sistema
+from modules.pipeline.ingestion import IngestionOrchestrationPipeline
+from modules.pipeline.execute_validate import ExecutionAndValidationPipeline
 
+def runner():
+    first_part = IngestionOrchestrationPipeline()
+    second_part = ExecutionAndValidationPipeline()
 
-# -- BASE -- 
-# 1. assembly_line -> /assembly/upsert
+    # Execute the first part of the pipeline
+    first_part.execute_assembly_line()
+    first_part.execute_forecaster()
+    first_part.execute_consumption()
+    first_part.execute_requests_builder()
 
-# 2. forecaster
-"""
-1. /forecast/upsert/fx4pd
-2. /forecast/upsert
-"""
+    # Check if there are values in the requests made table
+    requests_made = first_part.return_requests_made()
 
-# 3. consumption -> /consumption/update/to-consume
+    if requests_made:
+        # If there are values, execute the second part of the pipeline
+        second_part.execute_sap()
+        second_part.execute_requests_builder()
+        second_part.execute_requests_checker()
 
-# 4. requests_builder
-"""
-1. /requests-builder/upsert/to-request
-2. /requests-builder/requester
-"""
+        # Check if there are values in LT22
+        lt22_response = second_part._get("requests-checker/lt22/open")
+        lt22_data = lt22_response.json()
 
-# -- CASO NÃO TENHA VALORES NA TABELA REQUESTS MADE --
-# Voltar para 1. (assembly_line) e repetir o processo
-
-
-
-
-# -- CASO TENHA VALORES NA TABELA REQUESTS MADE --
-# 5. requests_made
+        if lt22_data:
+            # If there are values in LT22, execute requests closure
+            second_part.execute_requests_closure()
+        else:
+            # If there are no values in LT22, repeat the process from requests checker
+            second_part.execute_requests_checker()
+    else:
+        # If there are no values in requests made, repeat the process from assembly line
+        runner()

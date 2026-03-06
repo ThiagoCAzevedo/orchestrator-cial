@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     # -- MQTT CONFIG --
     AL_MQTT_ENDPOINT: str
     AL_MQTT_HOST: str
-    AL_MQTT_PORT: str
+    AL_MQTT_PORT: int
     AL_MQTT_SUBSCRIBE_TOPIC: str
     AL_MQTT_PATH:str
 
