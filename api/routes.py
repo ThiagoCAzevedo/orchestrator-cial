@@ -4,10 +4,9 @@ from common.logger import logger
 
 
 router = APIRouter()
-
-
 mqtt = MQTTOrchestrator()
 started = False
+
 
 @router.post("/mqtt/start")
 def start_mqtt():

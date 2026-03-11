@@ -17,7 +17,7 @@ class MQTTOrchestrator:
 
         self.client.on_message = self._on_message
 
-    def _on_message(self, client, userdata, msg):
+    def _on_message(self):
         if RUNNER_LOCK.locked():
             return
         

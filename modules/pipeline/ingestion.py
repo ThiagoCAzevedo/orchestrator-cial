@@ -1,19 +1,5 @@
 from common.pipeline_base import CoreAPIClient
 
-# 1. assembly_line -> /assembly/upsert
-
-# 2. forecaster
-"""
-1. /forecast/upsert/fx4pd
-2. /forecast/upsert
-"""
-
-# 3. consumption -> /consumption/update/to-consume
-
-# 4. requests_builder -> /requests-builder/upsert/to-request
-
-# -- CASO NÃO TENHA VALORES NA TABELA REQUESTS MADE --
-# Voltar para 1. (assembly_line) e repetir o processo
 
 class IngestionOrchestrationPipeline(CoreAPIClient):
     def __init__(self):
