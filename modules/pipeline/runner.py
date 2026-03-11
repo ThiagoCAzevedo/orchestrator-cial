@@ -1,36 +1,46 @@
+from config.settings import RUNNER_STOP
 from modules.pipeline.ingestion import IngestionOrchestrationPipeline
 from modules.pipeline.execute_validate import ExecutionAndValidationPipeline
 
+
 def runner():
+    if RUNNER_STOP.is_set():
+        return
+
     ingestion = IngestionOrchestrationPipeline()
     execute_validate = ExecutionAndValidationPipeline()
 
-    # Execute the first part of the pipeline
+    if RUNNER_STOP.is_set(): return
     ingestion.execute_assembly_line()
+    # time.sleep(5)
+
+    if RUNNER_STOP.is_set(): return
     ingestion.execute_forecaster()
+    # time.sleep(5)
+
+    if RUNNER_STOP.is_set(): return
     ingestion.execute_consumption()
+    # time.sleep(5)
+
+    if RUNNER_STOP.is_set(): return
     ingestion.execute_requests_builder()
-    
-    # # Check if there are values in the requests made table
+    # time.sleep(5)
+
+    if RUNNER_STOP.is_set(): return
     requests_made = ingestion.return_requests_made()
+    # time.sleep(5)
+
+    if RUNNER_STOP.is_set(): return
+    execute_validate.execute_sap()
+    # time.sleep(5)
+
+    if RUNNER_STOP.is_set(): return
 
     if requests_made:
-        # If there are values, execute the second part of the pipeline
-        execute_validate.execute_sap()
-        # execute_validate.execute_requests_builder()
-    #     execute_validate.execute_requests_checker()
-
-    #     # Check if there are values in LT22
-    #     lt22_response = execute_validate._get("requests-checker/lt22/open")
-    #     lt22_data = lt22_response.json()
-
-    #     if lt22_data:
-    #         # If there are values in LT22, execute requests closure
-    #         execute_validate.execute_requests_closure()
-    #     else:
-    #         # If there are no values in LT22, repeat the process from requests checker
-    #         execute_validate.execute_requests_checker()
-    # else:
-    #     # If there are no values in requests made, repeat the process from assembly line
-    #     runner()
-    print("fim")
+        if RUNNER_STOP.is_set(): return
+        execute_validate.execute_requests_builder()
+        # time.sleep(5)
+        
+        if RUNNER_STOP.is_set(): return
+        execute_validate.execute_requests_checker()
+        # time.sleep(5)

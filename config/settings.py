@@ -1,6 +1,9 @@
 from pydantic_settings import BaseSettings
 from pydantic import Field
+import threading
 
+RUNNER_LOCK = threading.Lock()
+RUNNER_STOP = threading.Event()
 
 class Settings(BaseSettings):
     # -- APP CONFIG --

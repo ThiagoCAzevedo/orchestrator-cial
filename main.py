@@ -15,7 +15,7 @@ def create_app() -> FastAPI:
 
     app = FastAPI(
         title="Auto Line Feeding API",
-        description="Auto Line Feeding microservice responsible for powering the static files (pkmc and pk05) to Auto Line Feeding Core microservice.",
+        description="",
         docs_url="/orchestrator-docs",
     )
 
