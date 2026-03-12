@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from common.logger import logger
+from common.schemas import APIResponse
 from api.routes import router as orquestrator_router
 from middleware.error_handler import setup_error_handlers
 from config.settings import settings
+from datetime import datetime
 import uvicorn
 
 
@@ -11,11 +13,9 @@ log = logger("main")
 
 
 def create_app() -> FastAPI:
-    log.info("Initializing FastAPI application")
-
     app = FastAPI(
         title="Auto Line Feeding API",
-        description="",
+        description="Orchestrator microservice responsible for powering 'core' microservice",
         docs_url="/orchestrator-docs",
     )
 
@@ -36,14 +36,25 @@ def create_app() -> FastAPI:
         prefix="/orchestrator"
     )
 
+    log.info("FastAPI application initialized successfully")
     return app
 
 
 app = create_app()
 
 
+@app.get("/health")
+def health_check():
+    log.debug("Health check request received")
+    return APIResponse(
+        success=True,
+        message="Service is healthy",
+        data={"status": "healthy", "app": settings.APP_NAME},
+        timestamp=datetime.now()
+    ).dict()
+
+
 if __name__ == "__main__":
-    log.info("Starting Uvicorn server (127.0.0.1:8001, reload=True)")
     try:
         uvicorn.run(
             "main:app",
@@ -54,9 +65,3 @@ if __name__ == "__main__":
     except Exception as e:
         log.error(f"Uvicorn server failed: {str(e)}", exc_info=True)
         raise
-
-
-# -- ROUTE FOR HEALTH CHECK --
-@app.get("/health")
-def health_check():
-    return {"status": "healthy", "app": settings.APP_NAME}

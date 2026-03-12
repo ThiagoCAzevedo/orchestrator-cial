@@ -1,11 +1,18 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from common.schemas import APIResponse
+from datetime import datetime
 
 
-async def global_exception_handler(exc: Exception):
+async def global_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=500,
-        content={"detail": "Internal server error", "error": str(exc)}
+        content=APIResponse(
+            success=False,
+            message="Internal server error",
+            error=str(exc),
+            timestamp=datetime.now()
+        ).dict()
     )
 
 

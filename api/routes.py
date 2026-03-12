@@ -1,34 +1,97 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from modules.mqtt_listener.listener import MQTTOrchestrator
 from common.logger import logger
-
+from common.schemas import APIResponse
+from datetime import datetime
 
 router = APIRouter()
-mqtt = MQTTOrchestrator()
-started = False
+log = logger("routes")
+
+mqtt_instance = None
+mqtt_running = False
+
+
+def _get_mqtt_instance() -> MQTTOrchestrator:
+    global mqtt_instance
+    if mqtt_instance is None:
+        log.debug("Creating new MQTT orchestrator instance")
+        mqtt_instance = MQTTOrchestrator()
+    return mqtt_instance
 
 
 @router.post("/mqtt/start")
 def start_mqtt():
-    if started:
-        logger.info("MQTT is already running")
-        return {"status": "already_running"}
+    global mqtt_running
+    
+    log.info("Received MQTT start request")
+    
+    if mqtt_running:
+        log.warning("MQTT start requested but already running")
+        return APIResponse(
+            success=True,
+            message="MQTT is already running",
+            data={"status": "already_running"},
+            timestamp=datetime.now()
+        ).dict()
 
-    mqtt.connect()
-    mqtt.start()
-    started = True
+    try:
+        mqtt = _get_mqtt_instance()
+        mqtt.connect()
+        mqtt.start()
+        mqtt_running = True
+        
+        log.info("MQTT started successfully")
+        return APIResponse(
+            success=True,
+            message="MQTT started successfully",
+            data={"status": "started"},
+            timestamp=datetime.now()
+        ).dict()
+        
+    except Exception as e:
+        log.error(f"Failed to start MQTT: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to start MQTT: {str(e)}")
 
-    logger.info("MQTT started successfully")
-    return {"status": "started"}
 
 @router.post("/mqtt/stop")
 def stop_mqtt():
-    if not started:
-        logger.info("MQTT is not running")
-        return {"status": "not_running"}
+    global mqtt_running
+    
+    log.info("Received MQTT stop request")
+    
+    if not mqtt_running:
+        log.warning("MQTT stop requested but not running")
+        return APIResponse(
+            success=True,
+            message="MQTT is not running",
+            data={"status": "not_running"},
+            timestamp=datetime.now()
+        ).dict()
 
-    mqtt.stop()
-    started = False
+    try:
+        mqtt = _get_mqtt_instance()
+        mqtt.stop()
+        mqtt_running = False
+        
+        log.info("MQTT stopped successfully")
+        return APIResponse(
+            success=True,
+            message="MQTT stopped successfully",
+            data={"status": "stopped"},
+            timestamp=datetime.now()
+        ).dict()
+        
+    except Exception as e:
+        log.error(f"Failed to stop MQTT: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to stop MQTT: {str(e)}")
 
-    logger.info("MQTT stopped successfully")
-    return {"status": "stopped"}
+
+@router.get("/mqtt/status")
+def mqtt_status():
+    log.debug("Received MQTT status request")
+    return APIResponse(
+        success=True,
+        message="MQTT status retrieved",
+        data={"status": "running" if mqtt_running else "stopped"},
+        timestamp=datetime.now()
+    ).dict()
