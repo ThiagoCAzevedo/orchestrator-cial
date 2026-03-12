@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
-import threading
+import threading, os
+
 
 RUNNER_LOCK = threading.Lock()
 RUNNER_STOP = threading.Event()
@@ -20,7 +21,7 @@ class Settings(BaseSettings):
     CORE_URL: str
 
     model_config = SettingsConfigDict(
-        env_file=["config/.env", "config/.env.test"],
+        env_file="config/.env.test" if os.getenv("TESTING") == "true" else "config/.env",
         extra="forbid",
         case_sensitive=True,
     )
