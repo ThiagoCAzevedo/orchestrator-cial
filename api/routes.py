@@ -1,8 +1,10 @@
+from config.settings import settings
 from fastapi import APIRouter, HTTPException
 from modules.mqtt_listener.listener import MQTTOrchestrator
 from common.logger import logger
 from common.schemas import APIResponse
 from datetime import datetime
+
 
 router = APIRouter()
 log = logger("routes")
@@ -93,5 +95,16 @@ def mqtt_status():
         success=True,
         message="MQTT status retrieved",
         data={"status": "running" if mqtt_running else "stopped"},
+        timestamp=datetime.now()
+    ).dict()
+    
+    
+@router.get("/health")
+def health_check():
+    log.debug("Health check request received")
+    return APIResponse(
+        success=True,
+        message="Service is healthy",
+        data={"status": "healthy", "app": settings.APP_NAME},
         timestamp=datetime.now()
     ).dict()
