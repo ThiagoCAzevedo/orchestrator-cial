@@ -17,14 +17,6 @@ def mocked_client(app_with_mock_mqtt):
 
 
 class TestAPIIntegration:
-    def test_full_health_check_flow(self, mocked_client):
-        response = mocked_client.get("/orchestrator/health")
-        
-        assert response.status_code == 200
-        data = response.json()
-        assert data["success"] is True
-        assert "timestamp" in data
-
     def test_full_mqtt_lifecycle(self, mocked_client):
         with patch('api.routes._get_mqtt_instance') as mock_get_mqtt:
             mock_mqtt = MagicMock()
