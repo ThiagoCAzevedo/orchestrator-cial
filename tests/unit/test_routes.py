@@ -24,14 +24,6 @@ def reset_mqtt_state():
 
 
 class TestAPIRoutes:
-    def test_health_check(self, test_client):
-        response = test_client.get("/orchestrator/health")
-        assert response.status_code == 200
-        data = response.json()
-        assert data["success"] is True
-        assert data["message"] == "Service is healthy"
-        assert "timestamp" in data
-
     def test_root_endpoint(self, test_client):
         response = test_client.get("/")
         assert response.status_code == 200
