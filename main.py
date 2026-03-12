@@ -43,17 +43,6 @@ def create_app() -> FastAPI:
 app = create_app()
 
 
-@app.get("/health")
-def health_check():
-    log.debug("Health check request received")
-    return APIResponse(
-        success=True,
-        message="Service is healthy",
-        data={"status": "healthy", "app": settings.APP_NAME},
-        timestamp=datetime.now()
-    ).dict()
-
-
 if __name__ == "__main__":
     try:
         uvicorn.run(
