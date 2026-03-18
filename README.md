@@ -115,5 +115,4 @@ To run tests, run the following command
 
 ## 🟢 Support
 
-For support, email nata.silva@gruposese.com or contact Sesé IT support.
-
+For support, email nata.silva@gruposese.com or contact Sesé IT support. 
